@@ -1,0 +1,70 @@
+1 -- Create a function to find factorial of a number
+CREATE OR REPLACE FUNCTION factorial(n NUMBER)
+RETURN NUMBER
+IS
+    result NUMBER := 1;
+BEGIN
+    IF n < 0 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Number must be non-negative.');
+    ELSIF n = 0 THEN
+        RETURN 1;
+    ELSE
+        FOR i IN 1..n LOOP
+            result := result * i;
+        END LOOP;
+        RETURN result;
+    END IF;
+END;
+/
+
+-- PL/SQL block to call the function
+DECLARE
+    num NUMBER := 5;       -- you can change this number
+    fact NUMBER;
+BEGIN
+    fact := factorial(num);
+    DBMS_OUTPUT.PUT_LINE('Factorial of ' || num || ' is: ' || fact);
+END;
+/
+2 CREATE TABLE BOOKS ( 
+BOOK_ID NUMBER PRIMARY KEY, 
+TITLE VARCHAR2(50), 
+AUTHOR VARCHAR2(50), 
+PRICE NUMBER 
+); 
+INSERT INTO BOOKS VALUES (101, 'DBMS Concepts', 'Navathe', 550); 
+INSERT INTO BOOKS VALUES (102, 'Let Us C', 'Yashwant Kanetkar', 450); 
+INSERT INTO BOOKS VALUES (103, 'Python Basics', 'Wes McKinney', 600); 
+COMMIT;
+CREATE OR REPLACE PROCEDURE get_book_info( 
+p_book_id IN BOOKS.BOOK_ID%TYPE, 
+p_book_name IN OUT BOOKS.TITLE%TYPE, 
+p_author OUT BOOKS.AUTHOR%TYPE, 
+p_price OUT BOOKS.PRICE%TYPE 
+) 
+IS 
+BEGIN 
+SELECT TITLE, AUTHOR, PRICE 
+INTO p_book_name, p_author, p_price 
+FROM BOOKS 
+WHERE BOOK_ID = p_book_id; 
+-- Modify INOUT parameter 
+p_book_name := UPPER(p_book_name); 
+EXCEPTION 
+WHEN NO_DATA_FOUND THEN 
+DBMS_OUTPUT.PUT_LINE('No book found with ID ' || p_book_id); 
+END; 
+/ 
+DECLARE 
+v_book_id BOOKS.BOOK_ID%TYPE := 102; 
+v_book_name BOOKS.TITLE%TYPE := 'Unknown'; 
+v_author BOOKS.AUTHOR%TYPE; 
+v_price BOOKS.PRICE%TYPE; 
+BEGIN 
+get_book_info(v_book_id, v_book_name, v_author, v_price); 
+DBMS_OUTPUT.PUT_LINE('Book ID: ' || v_book_id); 
+DBMS_OUTPUT.PUT_LINE('Book Name (Uppercase INOUT): ' || v_book_name); 
+DBMS_OUTPUT.PUT_LINE('Author: ' || v_author); 
+DBMS_OUTPUT.PUT_LINE('Price: ' || v_price); 
+END; 
+/ 
