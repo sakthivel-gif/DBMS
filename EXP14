@@ -1,0 +1,199 @@
+// 1️⃣ Restaurants except 'American' & 'Chinese' OR name begins with 'Wil'
+db.restaurants.find(
+  {
+    $or: [
+      { cuisine: { $nin: ["American", "Chinese"] } },
+      { name: /^Wil/i }
+    ]
+  },
+  { restaurant_id: 1, name: 1, borough: 1, cuisine: 1 }
+);
+
+// 2️⃣ Grade "A" and score 11 on 2014-08-11
+db.restaurants.find(
+  {
+    grades: {
+      $elemMatch: {
+        grade: "A",
+        score: 11,
+        date: ISODate("2014-08-11T00:00:00Z")
+      }
+    }
+  },
+  { restaurant_id: 1, name: 1, grades: 1 }
+);
+
+// 3️⃣ 2nd element of grades array with grade "A" and score 9 on 2014-08-11
+db.restaurants.find(
+  {
+    "grades.1.grade": "A",
+    "grades.1.score": 9,
+    "grades.1.date": ISODate("2014-08-11T00:00:00Z")
+  },
+  { restaurant_id: 1, name: 1, grades: 1 }
+);
+
+// 4️⃣ 2nd coord element between 42 and 52
+db.restaurants.find(
+  {
+    "address.coord.1": { $gt: 42, $lte: 52 }
+  },
+  { restaurant_id: 1, name: 1, address: 1, "address.coord": 1 }
+);
+
+// 5️⃣ Sort restaurant names ascending
+db.restaurants.find().sort({ name: 1 });
+
+// 6️⃣ Sort restaurant names descending
+db.restaurants.find().sort({ name: -1 });
+
+// 7️⃣ Sort cuisine ascending and borough descending
+db.restaurants.find().sort({ cuisine: 1, borough: -1 });
+
+// 8️⃣ Check whether all addresses have a street field
+db.restaurants.find({ "address.street": { $exists: true } });
+
+// 9️⃣ coord field value is Double
+db.restaurants.find({ "address.coord": { $type: "double" } });
+
+// 🔟 Restaurants with remainder 0 when score divided by 7
+db.restaurants.find(
+  { "grades.score": { $mod: [7, 0] } },
+  { restaurant_id: 1, name: 1, grades: 1 }
+);
+
+// 11️⃣ Name contains 'mon'
+db.restaurants.find(
+  { name: /mon/i },
+  { name: 1, borough: 1, "address.coord": 1, cuisine: 1 }
+);
+
+// 12️⃣ Name starts with 'Mad'
+db.restaurants.find(
+  { name: /^Mad/i },
+  { name: 1, borough: 1, "address.coord": 1, cuisine: 1 }
+);
+
+// 13️⃣ At least one grade < 5
+db.restaurants.find({ "grades.score": { $lt: 5 } });
+
+// 14️⃣ Grade < 5 and borough = Manhattan
+db.restaurants.find({ "grades.score": { $lt: 5 }, borough: "Manhattan" });
+
+// 15️⃣ Grade < 5 and borough = Manhattan or Brooklyn
+db.restaurants.find({
+  "grades.score": { $lt: 5 },
+  borough: { $in: ["Manhattan", "Brooklyn"] }
+});
+
+// 16️⃣ Same as above but cuisine not American
+db.restaurants.find({
+  "grades.score": { $lt: 5 },
+  borough: { $in: ["Manhattan", "Brooklyn"] },
+  cuisine: { $ne: "American" }
+});
+
+// 17️⃣ Same as above but cuisine not American or Chinese
+db.restaurants.find({
+  "grades.score": { $lt: 5 },
+  borough: { $in: ["Manhattan", "Brooklyn"] },
+  cuisine: { $nin: ["American", "Chinese"] }
+});
+
+// 18️⃣ Has both score 2 and 6
+db.restaurants.find({
+  "grades.score": { $all: [2, 6] }
+});
+
+// 19️⃣ Has scores 2 & 6 and borough Manhattan
+db.restaurants.find({
+  "grades.score": { $all: [2, 6] },
+  borough: "Manhattan"
+});
+
+// 20️⃣ Has scores 2 & 6 and borough Manhattan or Brooklyn
+db.restaurants.find({
+  "grades.score": { $all: [2, 6] },
+  borough: { $in: ["Manhattan", "Brooklyn"] }
+});
+
+// 21️⃣ Same as above but cuisine not American
+db.restaurants.find({
+  "grades.score": { $all: [2, 6] },
+  borough: { $in: ["Manhattan", "Brooklyn"] },
+  cuisine: { $ne: "American" }
+});
+
+// 22️⃣ Same as above but cuisine not American or Chinese
+db.restaurants.find({
+  "grades.score": { $all: [2, 6] },
+  borough: { $in: ["Manhattan", "Brooklyn"] },
+  cuisine: { $nin: ["American", "Chinese"] }
+});
+
+// 23️⃣ Has grade score 2 or 6
+db.restaurants.find({
+  $or: [
+    { "grades.score": 2 },
+    { "grades.score": 6 }
+  ]
+});
+
+
+// ==============================
+// 🎬 MOVIES COLLECTION QUERIES
+// ==============================
+
+// 1️⃣ Movies released in 1893
+db.movies.find({ year: 1893 });
+
+// 2️⃣ Movies with runtime > 120
+db.movies.find({ runtime: { $gt: 120 } });
+
+// 3️⃣ Movies with genre "Short"
+db.movies.find({ genres: "Short" });
+
+// 4️⃣ Movies directed by "William K.L. Dickson"
+db.movies.find({ directors: "William K.L. Dickson" });
+
+// 6️⃣ Movies released in USA
+db.movies.find({ countries: "USA" });
+
+// 7️⃣ Movies rated "UNRATED"
+db.movies.find({ rated: "UNRATED" });
+
+// 8️⃣ IMDb votes > 1000
+db.movies.find({ "imdb.votes": { $gt: 1000 } });
+
+// 9️⃣ IMDb rating > 7
+db.movies.find({ "imdb.rating": { $gt: 7 } });
+
+// 🔟 Tomatoes viewer rating > 4
+db.movies.find({ "tomatoes.viewer.rating": { $gt: 4 } });
+
+// 11️⃣ Movies that received an award
+db.movies.find({ "awards.wins": { $gt: 0 } });
+
+// 12️⃣ Movies with at least one nomination
+db.movies.find(
+  { "awards.nominations": { $gte: 1 } },
+  { title: 1, languages: 1, released: 1, directors: 1, writers: 1, awards: 1, year: 1, genres: 1, runtime: 1, cast: 1, countries: 1 }
+);
+
+// 13️⃣ Movies where cast includes "Charles Kayser"
+db.movies.find(
+  { cast: "Charles Kayser" },
+  { title: 1, languages: 1, released: 1, directors: 1, writers: 1, awards: 1, year: 1, genres: 1, runtime: 1, cast: 1, countries: 1 }
+);
+
+// 14️⃣ Movies released on May 9, 1893
+db.movies.find(
+  { released: ISODate("1893-05-09T00:00:00Z") },
+  { title: 1, languages: 1, released: 1, directors: 1, writers: 1, countries: 1 }
+);
+
+// 15️⃣ Movies having "scene" in the title
+db.movies.find(
+  { title: /scene/i },
+  { title: 1, languages: 1, released: 1, directors: 1, writers: 1, countries: 1 }
+);
