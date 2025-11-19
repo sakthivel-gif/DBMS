@@ -1,0 +1,53 @@
+--  PROGRAM 1
+-- Create a sequence for DEPT table primary key
+---------------------------------------------------------------
+CREATE SEQUENCE DEPT_ID_SEQ
+START WITH 200
+INCREMENT BY 10
+MAXVALUE 1000
+NOCACHE
+NOCYCLE;
+
+---------------------------------------------------------------
+--  PROGRAM 2
+-- Display details about all sequences
+---------------------------------------------------------------
+SELECT 
+    SEQUENCE_NAME,
+    MAX_VALUE,
+    INCREMENT_BY,
+    LAST_NUMBER
+FROM USER_SEQUENCES;
+
+---------------------------------------------------------------
+--  PROGRAM 3
+-- Insert rows into DEPT table using the sequence
+-- (Save this code in file: lab12_3.sql)
+---------------------------------------------------------------
+INSERT INTO DEPT (DEPT_ID, DEPT_NAME)
+VALUES (DEPT_ID_SEQ.NEXTVAL, 'Education');
+
+INSERT INTO DEPT (DEPT_ID, DEPT_NAME)
+VALUES (DEPT_ID_SEQ.NEXTVAL, 'Administration');
+
+-- Confirm insertion
+SELECT * FROM DEPT;
+
+---------------------------------------------------------------
+--  PROGRAM 4
+-- Create a non-unique index on the foreign key column (DEPT_ID) in EMP table
+---------------------------------------------------------------
+CREATE INDEX EMP_DEPTID_IDX
+ON EMP(DEPT_ID);
+
+---------------------------------------------------------------
+--  PROGRAM 5
+-- Display all indexes and uniqueness for the EMP table
+---------------------------------------------------------------
+SELECT 
+    INDEX_NAME,
+    TABLE_NAME,
+    UNIQUENESS
+FROM USER_INDEXES
+WHERE TABLE_NAME = 'EMP';
+
